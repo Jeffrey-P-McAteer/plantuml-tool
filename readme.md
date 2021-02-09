@@ -26,5 +26,8 @@ java -jar app/build/libs/app.jar
 Set the `PLANTUML_SRC_F` environment variable to change the source file
 which is modified in the "source" tab.
 
+# Screenshots
+
+![2021-02-09-1612899610.jpg](2021-02-09-1612899610.jpg)
 
 
