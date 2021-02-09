@@ -97,9 +97,7 @@ public class App {
                       // Update web view
                       if (GUI.webEngine != null) {
 
-                        // TODO svg rendering + js to move shapes
-                        //GUI.webEngine.loadContent("<h1>Test</h1>", "text/html");
-                        GUI.webEngine.loadContent(GUI.graph_svg_s, "image/svg+xml");
+                        GUI.webEngine.loadContent(gen_html_editor(), "text/html");
 
                         GUI.graph_svg_changed = false;
                       }
@@ -108,6 +106,37 @@ public class App {
                   }
                 });
             }
+        }
+
+        public static String gen_html_editor() {
+          StringBuffer sb = new StringBuffer();
+
+          sb.append("<html>");
+          sb.append("<body>");
+
+          sb.append("<style>");
+          sb.append(String.join("\n",
+            ".draggable { cursor: move; }",
+            "",
+            ""
+          ));
+          sb.append("</style>");
+
+          sb.append(GUI.graph_svg_s);
+
+          sb.append("<script>");
+          sb.append(String.join("\n",
+            "",
+            "",
+            ""
+          ));
+          sb.append("</script>");
+
+
+          sb.append("</body>");
+          sb.append("</html>");
+
+          return sb.toString();
         }
 
     }
@@ -125,11 +154,21 @@ public class App {
             if (GUI.plantuml_src_s == null || GUI.plantuml_src_s.length() < 1) {
               GUI.plantuml_src_s = DEFAULT_PLANTUML;
               GUI.plantuml_src_changed_from_bg = true;
+              GUI.plantuml_src_changed_from_gui = true;
             }
 
             // Save buffer from GUI into plantuml_src_f
             if (GUI.plantuml_src_changed_from_gui) {
-              System.err.println("TODO save: "+GUI.plantuml_src_s);
+              
+              // Save to plantuml_src_f
+              try {
+                try (PrintWriter out = new PrintWriter(GUI.plantuml_src_f)) {
+                    out.println(GUI.plantuml_src_s);
+                }
+              }
+              catch (Exception e) {
+                e.printStackTrace();
+              }
 
               // Update SVG
               try {
@@ -140,11 +179,23 @@ public class App {
                 e.printStackTrace();
               }
 
+              // Save to plantuml_src_f.txt + .svg
+              try {
+                String svg_path = GUI.plantuml_src_f.getAbsolutePath().replaceAll(".txt", ".svg");
+                if (!svg_path.contains(".svg")) {
+                  svg_path += ".svg";
+                }
+                try (PrintWriter out = new PrintWriter(svg_path)) {
+                    out.println(GUI.graph_svg_s);
+                }
+              }
+              catch (Exception e) {
+                e.printStackTrace();
+              }
+
+              GUI.plantuml_src_changed_from_gui = false;
+
             }
-
-
-            // Use PlantUML lib to convert buffer from GUI into .svg
-            GUI.graph_svg_changed = true;
 
         }
     }
