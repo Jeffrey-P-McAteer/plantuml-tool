@@ -53,6 +53,9 @@ dependencies {
     // Rich text exitor used in "source" tab
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
 
+    // Plant UML lib
+    compile group: 'com.credibledoc', name: 'plantuml-core', version: '1.0.27'
+
 
 }
 

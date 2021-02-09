@@ -93,6 +93,18 @@ public class App {
                       GUI.plantuml_src_changed_from_gui = true;
                     }
 
+                    if (GUI.graph_svg_changed) {
+                      // Update web view
+                      if (GUI.webEngine != null) {
+
+                        // TODO svg rendering + js to move shapes
+                        //GUI.webEngine.loadContent("<h1>Test</h1>", "text/html");
+                        GUI.webEngine.loadContent(GUI.graph_svg_s, "image/svg+xml");
+
+                        GUI.graph_svg_changed = false;
+                      }
+                    }
+
                   }
                 });
             }
@@ -118,6 +130,16 @@ public class App {
             // Save buffer from GUI into plantuml_src_f
             if (GUI.plantuml_src_changed_from_gui) {
               System.err.println("TODO save: "+GUI.plantuml_src_s);
+
+              // Update SVG
+              try {
+                GUI.graph_svg_s = com.credibledoc.plantuml.svggenerator.SvgGeneratorService.getInstance().generateSvgFromPlantUml(GUI.plantuml_src_s);
+                GUI.graph_svg_changed = true;
+              }
+              catch (Exception e) {
+                e.printStackTrace();
+              }
+
             }
 
 
