@@ -56,6 +56,8 @@ dependencies {
     // Plant UML lib
     compile group: 'com.credibledoc', name: 'plantuml-core', version: '1.0.27'
 
+    // FXGraph - interactive graph editor
+    compile "com.sirolf2009:fxgraph:0.0.3"
 
 }
 

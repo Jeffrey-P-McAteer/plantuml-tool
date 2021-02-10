@@ -78,7 +78,7 @@ public class App {
         // Also reads GUI data and pushes to bg_t_action.
         public static void gui_bg_t_updater() {
             while (!App.bg_t_exit_f) {
-                delay_ms(2_500l);
+                delay_ms(1_500l);
                 Platform.runLater(() -> {
                   if (GUI.codeArea != null) {
                     // Has the BG thread pushed new content?
@@ -148,11 +148,25 @@ public class App {
 
 
         while (!bg_t_exit_f) {
-            delay_ms(5_000l);
+            delay_ms(3_000l);
 
             // If buffer from GUI is empty, fill using text from plantuml_src_f or default
             if (GUI.plantuml_src_s == null || GUI.plantuml_src_s.length() < 1) {
-              GUI.plantuml_src_s = DEFAULT_PLANTUML;
+              if (GUI.plantuml_src_f.exists()) {
+                // Read the contents to plantuml_src_s
+                try {
+                  GUI.plantuml_src_s = new String(java.nio.file.Files.readAllBytes(GUI.plantuml_src_f.toPath()));
+                }
+                catch (Exception e) {
+                  e.printStackTrace();
+                  // Reading the file blew up, use the default
+                  GUI.plantuml_src_s = DEFAULT_PLANTUML;
+                }
+              }
+              else {
+                // Use the default
+                GUI.plantuml_src_s = DEFAULT_PLANTUML;
+              }
               GUI.plantuml_src_changed_from_bg = true;
               GUI.plantuml_src_changed_from_gui = true;
             }
