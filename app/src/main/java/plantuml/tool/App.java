@@ -14,11 +14,22 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.*;
 
-import javafx.scene.web.*;
+import javafx.geometry.Orientation;
 
 // 3rd-party dependencies
 import org.fxmisc.richtext.*;
 import org.fxmisc.flowless.VirtualizedScrollPane;
+
+import com.fxgraph.cells.RectangleCell;
+import com.fxgraph.cells.TriangleCell;
+import com.fxgraph.edges.CorneredEdge;
+import com.fxgraph.edges.DoubleCorneredEdge;
+import com.fxgraph.edges.Edge;
+import com.fxgraph.layout.AbegoTreeLayout;
+import org.abego.treelayout.Configuration.Location;
+import com.fxgraph.graph.*;
+
+import net.sourceforge.plantuml.SourceStringReader;
 
 public class App {
 
@@ -35,7 +46,7 @@ public class App {
         public static boolean plantuml_src_changed_from_bg = false; // written ONCE by bg_t_action, read by GUI
         public static boolean plantuml_src_changed_from_gui = false; // written by GUI, read by bg_t_action
 
-        public static String graph_svg_s = "";
+        //public static String graph_svg_s = "";
         public static boolean graph_svg_changed = true; // written by bg_t_action, read by GUI
 
         @Override
@@ -65,12 +76,11 @@ public class App {
             return new VirtualizedScrollPane<>(GUI.codeArea);
         }
 
-        private static WebEngine webEngine = null;
+        private static Pane graph_parent = null;
         public Node build_gui_editor() {
-            WebView webView = new WebView();
-            GUI.webEngine = webView.getEngine();
+            GUI.graph_parent = new Pane();
 
-            return webView;
+            return GUI.graph_parent;
         }
 
 
@@ -95,9 +105,9 @@ public class App {
 
                     if (GUI.graph_svg_changed) {
                       // Update web view
-                      if (GUI.webEngine != null) {
-
-                        GUI.webEngine.loadContent(gen_html_editor(), "text/html");
+                      if (GUI.graph_parent != null) {
+                      
+                        change_graph_ui();
 
                         GUI.graph_svg_changed = false;
                       }
@@ -108,35 +118,49 @@ public class App {
             }
         }
 
-        public static String gen_html_editor() {
-          StringBuffer sb = new StringBuffer();
+        public static void change_graph_ui() {
+            System.err.println("Building Graph UI... ");
 
-          sb.append("<html>");
-          sb.append("<body>");
+            Graph graph = new Graph();
 
-          sb.append("<style>");
-          sb.append(String.join("\n",
-            ".draggable { cursor: move; }",
-            "",
-            ""
-          ));
-          sb.append("</style>");
+            final Model model = graph.getModel();
+            graph.beginUpdate();
+            
+            final ICell cellA = new RectangleCell();
+            final ICell cellB = new RectangleCell();
+            final ICell cellC = new RectangleCell();
+            final ICell cellD = new TriangleCell();
+            final ICell cellE = new TriangleCell();
+            final ICell cellF = new RectangleCell();
+            final ICell cellG = new RectangleCell();
 
-          sb.append(GUI.graph_svg_s);
+            model.addCell(cellA);
+            model.addCell(cellB);
+            model.addCell(cellC);
+            model.addCell(cellD);
+            model.addCell(cellE);
+            model.addCell(cellF);
+            model.addCell(cellG);
 
-          sb.append("<script>");
-          sb.append(String.join("\n",
-            "",
-            "",
-            ""
-          ));
-          sb.append("</script>");
+            final Edge edgeAB = new Edge(cellA, cellB);
+            edgeAB.textProperty().set("Edges can have text too!");
+            model.addEdge(edgeAB);
+            final CorneredEdge edgeAC = new CorneredEdge(cellA, cellC, Orientation.HORIZONTAL);
+            edgeAC.textProperty().set("Edges can have corners too!");
+            model.addEdge(edgeAC);
+            model.addEdge(cellB, cellD);
+            final DoubleCorneredEdge edgeBE = new DoubleCorneredEdge(cellB, cellE, Orientation.HORIZONTAL);
+            edgeBE.textProperty().set("You can implement custom edges and nodes too!");
+            model.addEdge(edgeBE);
+            model.addEdge(cellC, cellF);
+            model.addEdge(cellC, cellG);
 
+            graph.endUpdate();
+            graph.layout(new AbegoTreeLayout(200, 200, Location.Top));
 
-          sb.append("</body>");
-          sb.append("</html>");
+            GUI.graph_parent.getChildren().clear();
+            GUI.graph_parent.getChildren().add(graph.getCanvas());
 
-          return sb.toString();
         }
 
     }
@@ -186,7 +210,10 @@ public class App {
 
               // Update SVG
               try {
-                GUI.graph_svg_s = com.credibledoc.plantuml.svggenerator.SvgGeneratorService.getInstance().generateSvgFromPlantUml(GUI.plantuml_src_s);
+                //GUI.graph_svg_s = com.credibledoc.plantuml.svggenerator.SvgGeneratorService.getInstance().generateSvgFromPlantUml(GUI.plantuml_src_s);
+                
+
+
                 GUI.graph_svg_changed = true;
               }
               catch (Exception e) {
@@ -200,7 +227,7 @@ public class App {
                   svg_path += ".svg";
                 }
                 try (PrintWriter out = new PrintWriter(svg_path)) {
-                    out.println(GUI.graph_svg_s);
+                    //out.println(GUI.graph_svg_s);
                 }
               }
               catch (Exception e) {

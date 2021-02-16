@@ -53,11 +53,14 @@ dependencies {
     // Rich text exitor used in "source" tab
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
 
-    // Plant UML lib
+    // Plant UML lib (https://github.com/credibledoc/credible-doc/tree/master/plantuml/plantuml-core)
     compile group: 'com.credibledoc', name: 'plantuml-core', version: '1.0.27'
 
     // FXGraph - interactive graph editor
     compile "com.sirolf2009:fxgraph:0.0.3"
+
+    // SVG renderer, because the FX one does not work.
+    compile "org.apache.xmlgraphics:batik:1.14"
 
 }
 

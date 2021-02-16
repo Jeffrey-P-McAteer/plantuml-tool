@@ -1,0 +1,36 @@
+@startuml
+
+skinparam nodestep 10
+
+class Alpha {
+  - {static} id: int
+  ==Friend Accessors==
+  - friend: Beta
+  + setFriend(Beta): void
+  + getFriend(): Beta
+  ==
+  - count: int
+  - getID(): int
+  + operateOn(Gamma): void
+}
+
+class Beta { 
+  + doWork(): void
+}
+
+class Gamma {
+  - alphas: List<Alpha>
+  + addAlpha(Alpha): void
+  + delAlpha(Alpha): void
+}
+
+Alpha::Beta "0..1" o-- Beta
+Gamma::alphas "*" o-- Alpha
+ 
+@enduml
+
+
+
+
+
+
