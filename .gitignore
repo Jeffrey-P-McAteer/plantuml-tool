@@ -3,3 +3,8 @@
 
 # Ignore Gradle build output directory
 build
+
+plantuml-src.txt
+plantuml-src.txt.svg
+plantuml-src.svg
+
