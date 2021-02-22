@@ -39,16 +39,19 @@ dependencies {
     compile "org.openjfx:javafx-graphics:11:win"
     compile "org.openjfx:javafx-controls:11:win"
     compile "org.openjfx:javafx-web:11:win"
+    compile "org.openjfx:javafx-swing:11:win"
 
     compile "org.openjfx:javafx-base:11:mac"
     compile "org.openjfx:javafx-graphics:11:mac"
     compile "org.openjfx:javafx-controls:11:mac"
     compile "org.openjfx:javafx-web:11:mac"
+    compile "org.openjfx:javafx-swing:11:mac"
 
     compile "org.openjfx:javafx-base:11:linux"
     compile "org.openjfx:javafx-graphics:11:linux"
     compile "org.openjfx:javafx-controls:11:linux"
     compile "org.openjfx:javafx-web:11:linux"
+    compile "org.openjfx:javafx-swing:11:linux"
 
     // Rich text exitor used in "source" tab
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
@@ -59,6 +62,11 @@ dependencies {
     // FXGraph - interactive graph editor
     compile "com.sirolf2009:fxgraph:0.0.3"
 
+    // SVG Renderer
+    compile ( "org.apache.xmlgraphics:batik-transcoder:1.14" ) {
+        exclude module: 'xalan'
+    }
+
 }
 
 javafx {
@@ -66,6 +74,7 @@ javafx {
     modules = [
         'javafx.controls', 'javafx.base',
         'javafx.graphics', 'javafx.web',
+        'javafx.swing',
     ]
 }
 

@@ -12,13 +12,20 @@ import javafx.application.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.image.*;
 import javafx.stage.*;
 
-import javafx.scene.web.*;
+import java.awt.image.BufferedImage;
+
+//import javafx.scene.web.*;
+import javafx.embed.swing.SwingFXUtils;
 
 // 3rd-party dependencies
 import org.fxmisc.richtext.*;
 import org.fxmisc.flowless.VirtualizedScrollPane;
+
+import org.apache.batik.transcoder.image.*;
+import org.apache.batik.transcoder.*;
 
 public class App {
 
@@ -65,12 +72,11 @@ public class App {
             return new VirtualizedScrollPane<>(GUI.codeArea);
         }
 
-        private static WebEngine webEngine = null;
+        private static ImageView svgGui = null;
         public Node build_gui_editor() {
-            WebView webView = new WebView();
-            GUI.webEngine = webView.getEngine();
+            GUI.svgGui = new ImageView();
 
-            return webView;
+            return GUI.svgGui;
         }
 
 
@@ -95,9 +101,9 @@ public class App {
 
                     if (GUI.graph_svg_changed) {
                       // Update web view
-                      if (GUI.webEngine != null) {
+                      if (GUI.svgGui != null) {
 
-                        GUI.webEngine.loadContent(gen_html_editor(), "text/html");
+                        render_svg_gui();
 
                         GUI.graph_svg_changed = false;
                       }
@@ -108,35 +114,18 @@ public class App {
             }
         }
 
-        public static String gen_html_editor() {
-          StringBuffer sb = new StringBuffer();
-
-          sb.append("<html>");
-          sb.append("<body>");
-
-          sb.append("<style>");
-          sb.append(String.join("\n",
-            ".draggable { cursor: move; }",
-            "",
-            ""
-          ));
-          sb.append("</style>");
-
-          sb.append(GUI.graph_svg_s);
-
-          sb.append("<script>");
-          sb.append(String.join("\n",
-            "",
-            "",
-            ""
-          ));
-          sb.append("</script>");
-
-
-          sb.append("</body>");
-          sb.append("</html>");
-
-          return sb.toString();
+        public static void render_svg_gui() {
+          BufferedImageTranscoder transcoder = new BufferedImageTranscoder();
+          try {
+              InputStream stream = new ByteArrayInputStream((GUI.graph_svg_s+"\r\n\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+              TranscoderInput transIn = new TranscoderInput(stream);
+              transcoder.transcode(transIn, null);
+              Image img = SwingFXUtils.toFXImage(transcoder.getBufferedImage(), null);
+              GUI.svgGui.setImage(img);
+          }
+          catch (Exception e) {
+              e.printStackTrace();
+          }
         }
 
     }
@@ -266,6 +255,21 @@ public class App {
       " ",
       "@enduml"
     );
+
+    public static class BufferedImageTranscoder extends ImageTranscoder {
+        private BufferedImage img = null;
+        @Override
+        public BufferedImage createImage(int width, int height) {
+            return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        }
+        @Override
+        public void writeImage(BufferedImage img, TranscoderOutput to) throws TranscoderException {
+            this.img = img;
+        }
+        public BufferedImage getBufferedImage() {
+            return img;
+        }
+    }
 
 }
 
